@@ -1,0 +1,52 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f8f8;
+  }
+  
+  .wrapper {
+    display: flex; /* Utilise flexbox pour aligner les éléments côte à côte */
+    justify-content: center; /* Centre les tableaux dans la page */
+    align-items: flex-start; /* Aligner les tableaux en haut */
+  }
+  
+  .table-container {
+    margin: 10px; /* Espacement autour de chaque tableau */
+  }
+
+  #sumContainer {
+    margin-top: 20px;
+    font-weight: bold;
+  }
+  
+  #sumHauteursFacade.overLimit {
+    color: red;
+  }
+  
+  
+  table {
+    border-collapse: collapse;
+  }
+  
+  .left-table,
+  .right-table {
+    border: 1px solid black; /* Bordure noire pour le tableau entier */
+  }
+  
+  th, 
+  td {
+    border: 1px solid black; /* Bordure noire pour chaque cellule */
+    padding: 8px;
+  }
+  
+  th {
+    background-color: #ddd; /* Couleur de fond pour les en-têtes de tableau */
+  }
+  
+  select {
+    width: 100%;
+    padding: 4px;
+    border: 1px solid black; /* Bordure pour les sélecteurs */
+  }
+  

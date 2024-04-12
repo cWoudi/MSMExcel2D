@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tableaux avec Menus Déroulants</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="wrapper">
+  <!-- Petit tableau à gauche -->
+  <div class="table-container">
+    <table class="left-table">
+      <tr><td>Hauteur Meuble</td><td><input type="number" id="hauteurMeuble" min="0"></td></tr>
+      <tr><td>Largeur Meuble</td><td><input type="number" id="largeurMeuble" min="0"></td></tr>
+      <tr><td>Nombre de Tiroirs</td><td><input type="number" id="nbTiroirs" min="1" value="0"></td></tr>
+      <tr>
+        <td>Espace Façade</td>
+        <td>
+          <select id="espaceFacade">
+            <option value="pdm">PDM</option>
+            <option value="normal">NORMAL</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td>Planche Basse/Haute</td>
+        <td>
+          <select id="plancheBasHaut">
+            <option value="pb">PB</option>
+            <option value="ph">PH</option>
+            <option value="pb & ph">PB & PH</option>
+            <option value="aucun">AUCUN</option>
+          </select>
+        </td>
+      </tr>
+    </table>
+    <!-- Après la fermeture de la première table -->
+<div id="sumContainer">
+  Somme des Hauteurs Façade : <span id="sumHauteursFacade">0</span>
+</div>
+  </div>
+
+  <!-- Grand tableau à droite -->
+  <div class="table-container">
+    <table class="right-table">
+      <thead>
+        <tr>
+          <th>Libellé</th>
+          <th>Hauteurs Façade</th>
+          <th>Hauteur Façade Réelle</th>
+          <!--<th>Type Tiroirs</th>-->
+          <!--<th>Type Coulisses</th>-->
+          <th>Emplacement Coulisses</th>
+          <!--<th>Longueur Coulisses</th>-->
+          <!-- Ajouter d'autres en-têtes de colonne ici -->
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Les lignes seront ajoutées par JavaScript -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

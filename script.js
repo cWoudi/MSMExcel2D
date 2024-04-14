@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
         sumElement.textContent = sum.toFixed(2);
         
         const hauteurMeuble = parseFloat(hauteurMeubleInput.value) || 0;
-        if (sum > hauteurMeuble) {
+        if (Math.abs(sum - hauteurMeuble) > 0.1) {
             sumElement.style.color = 'red';
             hauteurFacadeHeader.style.color = 'red';
         } else {
@@ -111,6 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
             hauteurFacadeHeader.style.color = 'black';
         }
     }
+    
 
     function updateAll() {
         updateDrawerRows(nbTiroirsInput.value);

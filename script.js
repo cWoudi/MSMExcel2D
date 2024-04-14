@@ -8,36 +8,58 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateDrawerRows() {
         const numberOfDrawers = parseInt(nbTiroirsInput.value) || 0;
+        const hauteurMeuble = parseFloat(hauteurMeubleInput.value) || 0;
+        const defaultHauteurFacade = hauteurMeuble / numberOfDrawers;
+        let isValid = true;
+    
         while (rightTable.firstChild) {
             rightTable.removeChild(rightTable.firstChild);
         }
-
-        const hauteurMeuble = parseFloat(hauteurMeubleInput.value) || 0;
-        const defaultHauteurFacade = hauteurMeuble / numberOfDrawers;
-
+    
         for (let i = 0; i < numberOfDrawers; i++) {
             const row = rightTable.insertRow();
             row.insertCell(0).textContent = `Tiroir ${i + 1}`;
-
+    
             const hauteursFacadeInput = document.createElement('input');
             hauteursFacadeInput.type = 'number';
             hauteursFacadeInput.className = 'hauteursFacade';
             hauteursFacadeInput.value = defaultHauteurFacade.toFixed(2);
             hauteursFacadeInput.addEventListener('input', () => {
                 calculateHauteurFacadeReelle(hauteursFacadeInput, i);
-                calculateEmplacementCoulisses(i); 
+                calculateEmplacementCoulisses(i);
+                checkFacadeHeight(hauteursFacadeInput); 
             });
             row.insertCell(1).appendChild(hauteursFacadeInput);
-
-            const cellHauteurFacadeReelle = row.insertCell(2);
-            cellHauteurFacadeReelle.textContent = '';  
-
-            row.insertCell(3);  
-
+    
+            row.insertCell(2); 
+            row.insertCell(3); 
+    
             calculateHauteurFacadeReelle(hauteursFacadeInput, i);
             calculateEmplacementCoulisses(i);
+    
+            if (parseFloat(hauteursFacadeInput.value) < 80) {
+                isValid = false;
+            }
+        }
+    
+        const heightError = document.getElementById('heightError');
+        heightError.style.display = isValid ? 'none' : 'block';
+    }
+    
+    function checkFacadeHeight(inputElement) {
+        const heightError = document.getElementById('heightError');
+        const height = parseFloat(inputElement.value);
+        if (height < 80) {
+            heightError.style.display = 'block';
+        } else {
+            const allValid = Array.from(document.querySelectorAll('.hauteursFacade'))
+                                  .every(input => parseFloat(input.value) >= 80);
+            if (allValid) {
+                heightError.style.display = 'none';
+            }
         }
     }
+    
 
     function calculateHauteurFacadeReelle(inputHauteursFacade, rowIndex) {
         const hauteurMeuble = parseFloat(hauteurMeubleInput.value) || 0;
@@ -103,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
         sumElement.textContent = sum.toFixed(2);
         
         const hauteurMeuble = parseFloat(hauteurMeubleInput.value) || 0;
-        if (Math.abs(sum - hauteurMeuble) > 0.1) {
+        if (Math.abs(sum - hauteurMeuble) > 0.03) {
             sumElement.style.color = 'red';
             hauteurFacadeHeader.style.color = 'red';
         } else {

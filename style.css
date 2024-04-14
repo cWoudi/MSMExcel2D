@@ -28,7 +28,7 @@ body {
   table {
     border-collapse: collapse;
   }
-  
+
   .left-table,
   .right-table {
     border: 1px solid black; /* Bordure noire pour le tableau entier */
@@ -49,4 +49,12 @@ body {
     padding: 4px;
     border: 1px solid black; /* Bordure pour les sélecteurs */
   }
+  
+  #heightError {
+    color: red;
+    max-width: 600px; /* Ou la largeur maximale selon votre mise en page */
+    white-space: normal;
+    display: none;
+}
+
   

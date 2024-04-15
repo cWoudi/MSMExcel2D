@@ -116,6 +116,48 @@ document.addEventListener('DOMContentLoaded', () => {
         const emplacementCoulissesCell = rightTable.rows[rowIndex].cells[3];
         emplacementCoulissesCell.textContent = valeurEmplacementCoulisses.toFixed(2);
     }
+
+    function drawMeuble() {
+        const canvas = document.getElementById('meubleCanvas');
+        if (!canvas) return; 
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height); 
+    
+        const hauteurMeuble = parseFloat(hauteurMeubleInput.value) || 0;
+        const largeurMeuble = parseFloat(document.querySelector('#largeurMeuble').value) || 0;
+    
+        const scaleFactor = Math.min((canvas.width - 40) / largeurMeuble, (canvas.height - 40) / hauteurMeuble);
+        const scaledHeight = hauteurMeuble * scaleFactor;
+        const scaledWidth = largeurMeuble * scaleFactor;
+    
+        const startX = (canvas.width - scaledWidth) / 2;
+        const startY = (canvas.height - scaledHeight) / 2;
+    
+        ctx.strokeRect(startX, startY, scaledWidth, scaledHeight);
+    
+        let cumulativeHeight = startY + scaledHeight;
+        Array.from(rightTable.rows).forEach(row => {
+            const emplacement = parseFloat(row.cells[3].textContent) || 0;
+            cumulativeHeight -= emplacement * scaleFactor; 
+            ctx.beginPath();
+            ctx.setLineDash([5, 5]); 
+            ctx.moveTo(startX, cumulativeHeight);
+            ctx.lineTo(startX + scaledWidth, cumulativeHeight);
+            ctx.stroke();
+            ctx.fillText(`${emplacement} mm`, startX - 30, cumulativeHeight); 
+        });
+    
+        ctx.setLineDash([]);
+        ctx.textAlign = 'center';
+        ctx.fillText(`Largeur: ${largeurMeuble} mm`, canvas.width / 2, canvas.height - 10);
+        ctx.textAlign = 'start';
+        ctx.fillText(`Hauteur: ${hauteurMeuble} mm`, 5, canvas.height / 2);
+    }
+    
+    hauteurMeubleInput.addEventListener('input', drawMeuble);
+    document.querySelector('#largeurMeuble').addEventListener('input', drawMeuble); 
+    nbTiroirsInput.addEventListener('change', drawMeuble); 
+    
     
     function updateSumHauteursFacade() {    
         let sum = 0;

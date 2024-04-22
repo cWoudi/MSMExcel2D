@@ -27,12 +27,16 @@ document.addEventListener('DOMContentLoaded', () => {
             hauteursFacadeInput.addEventListener('input', () => {
                 calculateHauteurFacadeReelle(hauteursFacadeInput, i);
                 calculateEmplacementCoulisses(i);
-                checkFacadeHeight(hauteursFacadeInput); 
+                checkFacadeHeight(hauteursFacadeInput);
+                drawMeuble(); 
             });
             row.insertCell(1).appendChild(hauteursFacadeInput);
     
-            row.insertCell(2); 
-            row.insertCell(3); 
+            const hauteurFacadeReelleCell = row.insertCell(2);
+            hauteurFacadeReelleCell.textContent = hauteursFacadeInput.value; 
+    
+            const emplacementCoulissesCell = row.insertCell(3);
+            emplacementCoulissesCell.textContent = '0.00'; 
     
             calculateHauteurFacadeReelle(hauteursFacadeInput, i);
             calculateEmplacementCoulisses(i);
@@ -40,12 +44,63 @@ document.addEventListener('DOMContentLoaded', () => {
             if (parseFloat(hauteursFacadeInput.value) < 80) {
                 isValid = false;
             }
+    
+            const tiroirAnglaiseCell = row.insertCell(4);
+            const tiroirAnglaiseCheckbox = document.createElement('input');
+            tiroirAnglaiseCheckbox.type = 'checkbox';
+            tiroirAnglaiseCheckbox.className = 'tiroir-anglaise';
+            tiroirAnglaiseCheckbox.disabled = (i === numberOfDrawers - 1); 
+            tiroirAnglaiseCheckbox.addEventListener('change', (e) => {
+                handleAnglaiseChange(e.target, i);
+            });
+            tiroirAnglaiseCell.appendChild(tiroirAnglaiseCheckbox);
         }
     
         const heightError = document.getElementById('heightError');
         heightError.style.display = isValid ? 'none' : 'block';
+        drawMeuble(); 
     }
     
+    function handleAnglaiseChange(checkbox, rowIndex) {
+        const currentHauteurFacadeReelleCell = rightTable.rows[rowIndex].cells[2];
+        const nextRowIndex = rowIndex + 1;
+        const nextHauteurFacadeReelleCell = rightTable.rows[nextRowIndex]?.cells[2];
+        const previousRowIndex = rowIndex - 1;
+    
+        if (checkbox.checked) {
+            if (nextHauteurFacadeReelleCell) {
+                const nextValue = parseFloat(nextHauteurFacadeReelleCell.textContent) || 0;
+                const currentValue = parseFloat(currentHauteurFacadeReelleCell.textContent) || 0;
+                currentHauteurFacadeReelleCell.textContent = (currentValue + nextValue).toFixed(2);
+                
+                nextHauteurFacadeReelleCell.textContent = '0.00';
+                nextHauteurFacadeReelleCell.style.backgroundColor = '#e0e0e0';
+            }
+        } else {
+            const inputHauteursFacade = rightTable.rows[rowIndex].cells[1].querySelector('input');
+            calculateHauteurFacadeReelle(inputHauteursFacade, rowIndex);
+    
+            if (nextRowIndex < nbTiroirsInput.value) {
+                const nextInputHauteursFacade = rightTable.rows[nextRowIndex].cells[1].querySelector('input');
+                calculateHauteurFacadeReelle(nextInputHauteursFacade, nextRowIndex);
+                
+                nextHauteurFacadeReelleCell.style.backgroundColor = '';
+            }
+        }
+    
+        if (previousRowIndex >= 0 && checkbox.checked) {
+            const previousCheckbox = rightTable.rows[previousRowIndex].cells[4].querySelector('.tiroir-anglaise');
+            if (previousCheckbox && previousCheckbox.checked) {
+                const previousHauteurFacadeReelleCell = rightTable.rows[previousRowIndex].cells[2];
+                const previousValue = parseFloat(previousHauteurFacadeReelleCell.textContent) || 0;
+                const addedValue = parseFloat(currentHauteurFacadeReelleCell.textContent) || 0;
+                previousHauteurFacadeReelleCell.textContent = (previousValue + addedValue).toFixed(2);
+            }
+        }
+    
+        drawMeuble(); 
+    }
+
     function checkFacadeHeight(inputElement) {
         const heightError = document.getElementById('heightError');
         const height = parseFloat(inputElement.value);
@@ -59,32 +114,32 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
-    
 
     function calculateHauteurFacadeReelle(inputHauteursFacade, rowIndex) {
         const hauteurMeuble = parseFloat(hauteurMeubleInput.value) || 0;
         const nombreDeTiroirs = parseInt(nbTiroirsInput.value) || 0;
         const espaceFacade = espaceFacadeSelect.value.toLowerCase();
         const hauteurFacade = parseFloat(inputHauteursFacade.value) || 0;
-    
+
         let hauteurFacadeReelle = 0;
         if (espaceFacade === "pdm") {
             hauteurFacadeReelle = (hauteurMeuble - (22 * (nombreDeTiroirs - 1))) * (hauteurFacade / hauteurMeuble);
         } else {
             hauteurFacadeReelle = (hauteurMeuble - (2 * (nombreDeTiroirs - 1))) * (hauteurFacade / hauteurMeuble);
         }
-    
+
         const hauteurFacadeReelleCell = rightTable.rows[rowIndex].cells[2];
         hauteurFacadeReelleCell.textContent = hauteurFacadeReelle.toFixed(2);
-    
+
         updateSumHauteursFacade();
+        drawMeuble(); 
     }
 
     function calculateEmplacementCoulisses(rowIndex) {
-        const plancheBasHaut = document.querySelector('#plancheBasHaut').value; 
-        const espaceFacade = espaceFacadeSelect.value; 
-        let hauteurFacadeReelle; 
-    
+        const plancheBasHaut = document.querySelector('#plancheBasHaut').value;
+        const espaceFacade = espaceFacadeSelect.value;
+        let hauteurFacadeReelle;
+
         if (rowIndex === 0) {
             hauteurFacadeReelle = parseFloat(rightTable.rows[rowIndex].cells[2].textContent) || 0;
             if (!hauteurFacadeReelle || !espaceFacade || !plancheBasHaut) {
@@ -112,16 +167,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 valeurEmplacementCoulisses = espaceFacade === "pdm" ? emplacementCoulissesPrecedent + hauteurFacadeReelle + 22 : emplacementCoulissesPrecedent + hauteurFacadeReelle + 2;
             }
         }
-    
+
         const emplacementCoulissesCell = rightTable.rows[rowIndex].cells[3];
         emplacementCoulissesCell.textContent = valeurEmplacementCoulisses.toFixed(2);
+        drawMeuble(); 
     }
 
     function drawMeuble() {
         const canvas = document.getElementById('meubleCanvas');
-        if (!canvas) return; 
+        if (!canvas) return;
         const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height); 
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
     
         const hauteurMeuble = parseFloat(hauteurMeubleInput.value) || 0;
         const largeurMeuble = parseFloat(document.querySelector('#largeurMeuble').value) || 0;
@@ -135,23 +191,23 @@ document.addEventListener('DOMContentLoaded', () => {
     
         ctx.strokeRect(startX, startY, scaledWidth, scaledHeight);
     
-        let cumulativeHeight = startY + scaledHeight;
-        Array.from(rightTable.rows).forEach(row => {
-            const emplacement = parseFloat(row.cells[3].textContent) || 0;
-            cumulativeHeight -= emplacement * scaleFactor; 
+        for (let i = rightTable.rows.length - 1; i >= 0; i--) {
+            const emplacement = parseFloat(rightTable.rows[i].cells[3].textContent) || 0;
+            let emplacementHeight = startY + scaledHeight - (emplacement * scaleFactor);
+    
             ctx.beginPath();
-            ctx.setLineDash([5, 5]); 
-            ctx.moveTo(startX, cumulativeHeight);
-            ctx.lineTo(startX + scaledWidth, cumulativeHeight);
+            ctx.setLineDash([5, 5]);
+            ctx.moveTo(startX, emplacementHeight);
+            ctx.lineTo(startX + scaledWidth, emplacementHeight);
             ctx.stroke();
-            ctx.fillText(`${emplacement} mm`, startX - 30, cumulativeHeight); 
-        });
+            ctx.fillText(`${emplacement} mm`, startX + scaledWidth + 5, emplacementHeight);
+        }
     
         ctx.setLineDash([]);
         ctx.textAlign = 'center';
-        ctx.fillText(`Largeur: ${largeurMeuble} mm`, canvas.width / 2, canvas.height - 10);
+        ctx.fillText(`Largeur: ${largeurMeuble} mm`, canvas.width / 2, startY + scaledHeight + 20);
         ctx.textAlign = 'start';
-        ctx.fillText(`Hauteur: ${hauteurMeuble} mm`, 5, canvas.height / 2);
+        ctx.fillText(`Hauteur: ${hauteurMeuble} mm`, startX - 50, startY + scaledHeight / 2);
     }
     
     hauteurMeubleInput.addEventListener('input', drawMeuble);
@@ -188,4 +244,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
     updateAll();
 });
-

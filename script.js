@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const tiroirAnglaiseCheckbox = document.createElement('input');
             tiroirAnglaiseCheckbox.type = 'checkbox';
             tiroirAnglaiseCheckbox.className = 'tiroir-anglaise';
-            tiroirAnglaiseCheckbox.disabled = (i === numberOfDrawers - 1); 
+            tiroirAnglaiseCheckbox.disabled = (i === 0); 
             tiroirAnglaiseCheckbox.addEventListener('change', (e) => {
                 handleAnglaiseChange(e.target, i);
             });
@@ -62,44 +62,46 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function handleAnglaiseChange(checkbox, rowIndex) {
-        const currentHauteurFacadeReelleCell = rightTable.rows[rowIndex].cells[2];
-        const nextRowIndex = rowIndex + 1;
-        const nextHauteurFacadeReelleCell = rightTable.rows[nextRowIndex]?.cells[2];
+        const currentRow = rightTable.rows[rowIndex];
+        const currentHauteurFacadeReelleCell = currentRow.cells[2];
+        const currentInputHauteursFacade = currentRow.cells[1].querySelector('input');
+    
         const previousRowIndex = rowIndex - 1;
+        const previousRow = rightTable.rows[previousRowIndex];
+        const previousHauteurFacadeReelleCell = previousRow?.cells[2];
+        const previousInputHauteursFacade = previousRow?.cells[1].querySelector('input');
     
         if (checkbox.checked) {
-            if (nextHauteurFacadeReelleCell) {
-                const nextValue = parseFloat(nextHauteurFacadeReelleCell.textContent) || 0;
+            if (previousHauteurFacadeReelleCell) {
                 const currentValue = parseFloat(currentHauteurFacadeReelleCell.textContent) || 0;
-                currentHauteurFacadeReelleCell.textContent = (currentValue + nextValue).toFixed(2);
-                
-                nextHauteurFacadeReelleCell.textContent = '0.00';
-                nextHauteurFacadeReelleCell.style.backgroundColor = '#e0e0e0';
+                const previousValue = parseFloat(previousHauteurFacadeReelleCell.textContent) || 0;
+                previousHauteurFacadeReelleCell.textContent = (currentValue + previousValue).toFixed(2);
+                currentHauteurFacadeReelleCell.textContent = '0.00';
+                currentHauteurFacadeReelleCell.style.backgroundColor = '#e0e0e0';
             }
         } else {
-            const inputHauteursFacade = rightTable.rows[rowIndex].cells[1].querySelector('input');
-            calculateHauteurFacadeReelle(inputHauteursFacade, rowIndex);
+            if (previousHauteurFacadeReelleCell) {
+                // Conserver la valeur originale du tiroir actuel avant de recalculer la valeur du tiroir précédent
+                const originalCurrentHauteur = parseFloat(currentInputHauteursFacade.value) || 0;
     
-            if (nextRowIndex < nbTiroirsInput.value) {
-                const nextInputHauteursFacade = rightTable.rows[nextRowIndex].cells[1].querySelector('input');
-                calculateHauteurFacadeReelle(nextInputHauteursFacade, nextRowIndex);
-                
-                nextHauteurFacadeReelleCell.style.backgroundColor = '';
+                // Recalculer la hauteur façade réelle pour le tiroir précédent
+                calculateHauteurFacadeReelle(previousInputHauteursFacade, previousRowIndex);
+                const recalculatedPreviousValue = parseFloat(previousHauteurFacadeReelleCell.textContent) || 0;
+    
+                // Ajuster la hauteur du tiroir actuel
+                currentHauteurFacadeReelleCell.textContent = (originalCurrentHauteur - recalculatedPreviousValue).toFixed(2);
+                currentHauteurFacadeReelleCell.style.backgroundColor = '';
             }
+    
+            // Recalculer également la hauteur du tiroir actuel
+            calculateHauteurFacadeReelle(currentInputHauteursFacade, rowIndex);
         }
     
-        if (previousRowIndex >= 0 && checkbox.checked) {
-            const previousCheckbox = rightTable.rows[previousRowIndex].cells[4].querySelector('.tiroir-anglaise');
-            if (previousCheckbox && previousCheckbox.checked) {
-                const previousHauteurFacadeReelleCell = rightTable.rows[previousRowIndex].cells[2];
-                const previousValue = parseFloat(previousHauteurFacadeReelleCell.textContent) || 0;
-                const addedValue = parseFloat(currentHauteurFacadeReelleCell.textContent) || 0;
-                previousHauteurFacadeReelleCell.textContent = (previousValue + addedValue).toFixed(2);
-            }
-        }
-    
-        drawMeuble(); 
+        drawMeuble(); // Redessiner après les changements
     }
+    
+    
+    
 
     function checkFacadeHeight(inputElement) {
         const heightError = document.getElementById('heightError');

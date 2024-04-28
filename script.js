@@ -81,6 +81,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     
     
+    let decalageAnglaise = 0;
+    let decalageAnglaiseRow;
+
     function handleAnglaiseChange(checkbox, rowIndex) {
         const currentRow = rightTable.rows[rowIndex];
         const currentHauteurFacadeReelleCell = currentRow.cells[2];
@@ -98,9 +101,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 previousHauteurFacadeReelleCell.textContent = (currentValue + previousValue).toFixed(2);
                 currentHauteurFacadeReelleCell.textContent = '0.00';
                 currentHauteurFacadeReelleCell.style.backgroundColor = '#e0e0e0';
+                decalageAnglaise = 25;
+                decalageAnglaiseRow = rowIndex;
             }
         } else {
             if (previousHauteurFacadeReelleCell) {
+                decalageAnglaise = 0;
+                decalageAnglaiseRow = rowIndex;
                 // Conserver la valeur originale du tiroir actuel avant de recalculer la valeur du tiroir précédent
                 const originalCurrentHauteur = parseFloat(currentInputHauteursFacade.value) || 0;
     
@@ -202,38 +209,36 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     
         const hauteurMeuble = parseFloat(hauteurMeubleInput.value) || 0;
-        const largeurMeuble = parseFloat(largeurMeubleInput.value) || 0;
+        const largeurMeuble = parseFloat(document.querySelector('#largeurMeuble').value) || 0;
+    
         const scaleFactor = Math.min((canvas.width - 40) / largeurMeuble, (canvas.height - 40) / hauteurMeuble);
         const scaledHeight = hauteurMeuble * scaleFactor;
         const scaledWidth = largeurMeuble * scaleFactor;
+    
         const startX = (canvas.width - scaledWidth) / 2;
         const startY = (canvas.height - scaledHeight) / 2;
     
-        // Dessiner le rectangle du meuble
         ctx.strokeRect(startX, startY, scaledWidth, scaledHeight);
     
-        // Obtenir les éléments pour Encastré et Tiroir à l'anglaise en dehors de la boucle
-        const encastréElement = document.querySelector('.encastré');
-        const encastré = encastréElement ? encastréElement.value : '';
-        const tiroirAnglaiseCheckbox = document.querySelector('.tiroir-anglaise');
-        const tiroirAnglaise = tiroirAnglaiseCheckbox ? tiroirAnglaiseCheckbox.checked : false;
+        for (let i = rightTable.rows.length - 1; i >= 0; i--) {
+            const emplacement = parseFloat(rightTable.rows[i].cells[3].textContent) || 0;
+            
+            let emplacementHeight = startY + scaledHeight - (emplacement * scaleFactor);
+            let emplacementDecale = startX + 37 + 63;
+            let emplacementDecaleTxt = 37 + 63;
+
+            if (i == decalageAnglaiseRow){
+                emplacementDecale = startX + 37 + 63 + decalageAnglaise;
+                emplacementDecaleTxt = 37 + 63 + decalageAnglaise;
+            }
     
-        const rows = rightTable.querySelectorAll('tr');
-        rows.forEach(row => {
-            const emplacement = parseFloat(row.cells[3].textContent) || 0;
-            const emplacementHeight = startY + scaledHeight - (emplacement * scaleFactor);
-    
-            let offset = 37; // Début des pointillés à 37mm par défaut
-            if (tiroirAnglaise) offset += 25;
-            if (encastré === '1c' || encastré === '2c') offset += 63;
-    
-            // Dessiner les lignes en pointillé pour l'emplacement des coulisses
             ctx.beginPath();
             ctx.setLineDash([5, 5]);
-            ctx.moveTo(startX + offset, emplacementHeight);
+            ctx.moveTo(emplacementDecale, emplacementHeight);
             ctx.lineTo(startX + scaledWidth, emplacementHeight);
             ctx.stroke();
-        });
+            ctx.fillText(`${emplacement} mm (${emplacementDecaleTxt} mm)`, startX + scaledWidth + 5, emplacementHeight);
+        }
     
         ctx.setLineDash([]);
         ctx.textAlign = 'center';

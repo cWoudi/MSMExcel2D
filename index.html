@@ -14,6 +14,7 @@
     <table class="left-table">
       <tr><td>Hauteur Meuble</td><td><input type="number" id="hauteurMeuble" min="0"></td></tr>
       <tr><td>Largeur Meuble</td><td><input type="number" id="largeurMeuble" min="0"></td></tr>
+      <tr><td>Profondeur Meuble</td><td><input type="number" id="profondeurMeuble" min="300" required></td></tr>
       <tr><td>Nombre de Tiroirs</td><td><input type="number" id="nbTiroirs" min="1" value="0"></td></tr>
       <tr>
         <td>Espace Façade</td>
@@ -49,17 +50,15 @@
           <th>Libellé</th>
           <th>Hauteurs Façade</th>
           <th>Hauteur Façade Réelle</th>
-          <!--<th>Type Tiroirs</th>-->
-          <!--<th>Type Coulisses</th>-->
           <th>Emplacement Coulisses</th>
           <th>Tiroir à l'anglaise ?</th>
-          <!--<th>Longueur Coulisses</th>-->
+          <th>Encastré</th>
         </tr>
       </thead>
       <tbody>
         <!-- Les lignes seront ajoutées par JavaScript -->
       </tbody>
-    </table>
+    </table>    
   </div>
 </div>
 <canvas id="meubleCanvas" width="600" height="400" style="border:1px solid #000; display: block; margin: 20px auto;"></canvas>

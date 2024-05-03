@@ -7,6 +7,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const sumElement = document.querySelector('#sumHauteursFacade');
     const hauteurFacadeHeader = document.querySelector('.right-table th:nth-child(2)');
 
+    function calculateLongueurCoulisses(row) {
+        const profondeurMeuble = parseFloat(document.getElementById('profondeurMeuble').value) || 300; 
+        const tiroirAnglaise = row.querySelector('.tiroir-anglaise') ? row.querySelector('.tiroir-anglaise').checked : false;
+        const encastréSelect = row.querySelector('.encastré');
+        const encastré = encastréSelect ? encastréSelect.value : 'none';
+    
+        let baseReduction = 25;
+        let additionalReduction = 0;
+        if (tiroirAnglaise) additionalReduction += 25;
+        if (encastré === '2c') additionalReduction += 63;
+    
+        const maxLength = profondeurMeuble - baseReduction - additionalReduction;
+        const possibleLengths = [270, 300, 350, 400, 450, 500, 550, 600];
+        return possibleLengths.filter(length => length <= maxLength);
+    }
+   
     function updateDrawerRows() {
         const numberOfDrawers = parseInt(nbTiroirsInput.value) || 0;
         const hauteurMeuble = parseFloat(hauteurMeubleInput.value) || 0;
@@ -19,15 +35,17 @@ document.addEventListener('DOMContentLoaded', () => {
     
         const encastréSelect = document.createElement('select');
         encastréSelect.className = 'encastré';
+        const option0C = new Option('0C', '0c');
         const option1C = new Option('1C', '1c');
         const option2C = new Option('2C', '2c');
+        encastréSelect.add(option0C, undefined);
         encastréSelect.add(option1C, undefined);
         encastréSelect.add(option2C, undefined);
-    
-        // Prepare a cell to insert the select only once and set it to span all rows
         const encastréCell = document.createElement('td');
         encastréCell.appendChild(encastréSelect);
-        encastréCell.rowSpan = numberOfDrawers;
+        encastréCell.rowSpan = numberOfDrawers; 
+        encastréCell.addEventListener('change', drawMeuble);
+
     
         for (let i = 0; i < numberOfDrawers; i++) {
             const row = rightTable.insertRow();
@@ -68,10 +86,21 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             tiroirAnglaiseCell.appendChild(tiroirAnglaiseCheckbox);
     
-            // Add the encastré selector to the first row only
             if (i === 0) {
                 row.appendChild(encastréCell);
             }
+
+            const validLengths = calculateLongueurCoulisses(row);
+            const lgCoulissesCell = row.insertCell();
+            const lgCoulissesSelect = document.createElement('select');
+            lgCoulissesSelect.className = 'lg-coulisses';
+            validLengths.forEach(length => {
+                const option = new Option(length, length);
+                lgCoulissesSelect.add(option);
+            });
+            lgCoulissesSelect.value = validLengths.length > 0 ? Math.max(...validLengths) : "N/A";
+            lgCoulissesCell.appendChild(lgCoulissesSelect);
+
         }
     
         const heightError = document.getElementById('heightError');
@@ -79,11 +108,6 @@ document.addEventListener('DOMContentLoaded', () => {
         drawMeuble(); 
     }
     
-    
-    
-    let decalageAnglaise = 0;
-    let decalageAnglaiseRow;
-
     function handleAnglaiseChange(checkbox, rowIndex) {
         const currentRow = rightTable.rows[rowIndex];
         const currentHauteurFacadeReelleCell = currentRow.cells[2];
@@ -101,30 +125,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 previousHauteurFacadeReelleCell.textContent = (currentValue + previousValue).toFixed(2);
                 currentHauteurFacadeReelleCell.textContent = '0.00';
                 currentHauteurFacadeReelleCell.style.backgroundColor = '#e0e0e0';
-                decalageAnglaise = 25;
-                decalageAnglaiseRow = rowIndex;
             }
         } else {
             if (previousHauteurFacadeReelleCell) {
-                decalageAnglaise = 0;
-                decalageAnglaiseRow = rowIndex;
-                // Conserver la valeur originale du tiroir actuel avant de recalculer la valeur du tiroir précédent
                 const originalCurrentHauteur = parseFloat(currentInputHauteursFacade.value) || 0;
     
-                // Recalculer la hauteur façade réelle pour le tiroir précédent
                 calculateHauteurFacadeReelle(previousInputHauteursFacade, previousRowIndex);
                 const recalculatedPreviousValue = parseFloat(previousHauteurFacadeReelleCell.textContent) || 0;
     
-                // Ajuster la hauteur du tiroir actuel
                 currentHauteurFacadeReelleCell.textContent = (originalCurrentHauteur - recalculatedPreviousValue).toFixed(2);
                 currentHauteurFacadeReelleCell.style.backgroundColor = '';
             }
     
-            // Recalculer également la hauteur du tiroir actuel
             calculateHauteurFacadeReelle(currentInputHauteursFacade, rowIndex);
         }
     
-        drawMeuble(); // Redessiner après les changements
+        drawMeuble(); 
     }
     
     
@@ -209,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     
         const hauteurMeuble = parseFloat(hauteurMeubleInput.value) || 0;
-        const largeurMeuble = parseFloat(document.querySelector('#largeurMeuble').value) || 0;
+        const largeurMeuble = parseFloat(largeurMeubleInput.value) || 0;
     
         const scaleFactor = Math.min((canvas.width - 40) / largeurMeuble, (canvas.height - 40) / hauteurMeuble);
         const scaledHeight = hauteurMeuble * scaleFactor;
@@ -220,25 +236,32 @@ document.addEventListener('DOMContentLoaded', () => {
     
         ctx.strokeRect(startX, startY, scaledWidth, scaledHeight);
     
-        for (let i = rightTable.rows.length - 1; i >= 0; i--) {
-            const emplacement = parseFloat(rightTable.rows[i].cells[3].textContent) || 0;
-            
-            let emplacementHeight = startY + scaledHeight - (emplacement * scaleFactor);
-            let emplacementDecale = startX + 37 + 63;
-            let emplacementDecaleTxt = 37 + 63;
-
-            if (i == decalageAnglaiseRow){
-                emplacementDecale = startX + 37 + 63 + decalageAnglaise;
-                emplacementDecaleTxt = 37 + 63 + decalageAnglaise;
+        const encastréSelect = document.querySelector('.encastré');
+        const encastréValue = encastréSelect ? encastréSelect.value : '0c';
+    
+        const rows = rightTable.querySelectorAll('tr');
+        rows.forEach(row => {
+            const emplacement = parseFloat(row.cells[3].textContent) || 0;
+            const emplacementHeight = startY + scaledHeight - (emplacement * scaleFactor);
+    
+            let offset = 37;
+    
+            const tiroirAnglaiseCheckbox = row.querySelector('.tiroir-anglaise');
+            if (tiroirAnglaiseCheckbox && tiroirAnglaiseCheckbox.checked) {
+                offset += 25;
+            }
+    
+            if (encastréValue === '1c' || encastréValue === '2c') {
+                offset += 63; 
             }
     
             ctx.beginPath();
             ctx.setLineDash([5, 5]);
-            ctx.moveTo(emplacementDecale, emplacementHeight);
+            ctx.moveTo(startX + (offset * scaleFactor), emplacementHeight); 
             ctx.lineTo(startX + scaledWidth, emplacementHeight);
             ctx.stroke();
-            ctx.fillText(`${emplacement} mm (${emplacementDecaleTxt} mm)`, startX + scaledWidth + 5, emplacementHeight);
-        }
+            ctx.fillText(`${emplacement} mm (${offset} mm)`, startX + scaledWidth + 5, emplacementHeight);
+        });
     
         ctx.setLineDash([]);
         ctx.textAlign = 'center';
@@ -246,6 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.textAlign = 'start';
         ctx.fillText(`Hauteur: ${hauteurMeuble} mm`, startX - 50, startY + scaledHeight / 2);
     }
+    
     
     hauteurMeubleInput.addEventListener('input', drawMeuble);
     document.querySelector('#largeurMeuble').addEventListener('input', drawMeuble); 
@@ -271,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
 
     function updateAll() {
-        updateDrawerRows(nbTiroirsInput.value);
+        updateDrawerRows();
         updateSumHauteursFacade();
     }
 

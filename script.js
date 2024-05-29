@@ -44,7 +44,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const encastréCell = document.createElement('td');
         encastréCell.appendChild(encastréSelect);
         encastréCell.rowSpan = numberOfDrawers; 
-        encastréCell.addEventListener('change', drawMeuble);
+        encastréCell.addEventListener('change', () => {
+            drawMeuble();
+            updateThirdTable();
+        });
 
     
         for (let i = 0; i < numberOfDrawers; i++) {
@@ -101,12 +104,106 @@ document.addEventListener('DOMContentLoaded', () => {
             lgCoulissesSelect.value = validLengths.length > 0 ? Math.max(...validLengths) : "N/A";
             lgCoulissesCell.appendChild(lgCoulissesSelect);
 
+            const hauteurCoteInput = document.createElement('input');
+            hauteurCoteInput.type = 'number';
+            hauteurCoteInput.className = 'hauteurCote';
+            hauteurCoteInput.value = 150;
+            hauteurCoteInput.min = 70;
+            hauteurCoteInput.max = parseFloat(hauteurFacadeReelleCell.textContent) - 10;
+            if (parseFloat(hauteurCoteInput.value) > hauteurCoteInput.max) {
+                hauteurCoteInput.value = hauteurCoteInput.max;
+            }
+            row.insertCell().appendChild(hauteurCoteInput);
+    
+            hauteurCoteInput.addEventListener('input', () => {
+                if (parseFloat(hauteurCoteInput.value) > hauteurCoteInput.max) {
+                    hauteurCoteInput.value = hauteurCoteInput.max;
+                    updateThirdTable()
+                }
+            });
+            hauteurCoteInput.addEventListener('change', () => {
+                updateThirdTable();
+            });
+
         }
     
         const heightError = document.getElementById('heightError');
         heightError.style.display = isValid ? 'none' : 'block';
         drawMeuble(); 
     }
+
+    function updateThirdTable() {
+        const drawerDimensionsBody = document.getElementById('drawerDimensionsBody');
+        if (!drawerDimensionsBody) {
+            console.error('Table body for drawer dimensions not found');
+            return;
+        }
+    
+        drawerDimensionsBody.innerHTML = '';
+        
+        const encastréSelect = document.querySelector('.encastré');
+        const encastré = encastréSelect ? encastréSelect.value : '0c';
+    
+        const rows = rightTable.querySelectorAll('tr');
+        rows.forEach((row, index) => { 
+            const hauteurCoteInput = row.querySelector('.hauteurCote');
+            const lgCoulissesSelect = row.querySelector('.lg-coulisses');
+    
+            if (!hauteurCoteInput || !lgCoulissesSelect) {
+                console.error('Required inputs not found in row', index);
+                return;
+            }
+    
+            const hauteurCote = parseFloat(hauteurCoteInput.value);
+            const lgCoulisses = parseFloat(lgCoulissesSelect.value);
+            
+            // Calculs basés sur l'encastrement
+            let largeurDuMeuble;
+            switch (encastré) {
+                case '0c':
+                    largeurDuMeuble = 48;
+                    break;
+                case '1c':
+                    largeurDuMeuble = 88;
+                    break;
+                case '2c':
+                    largeurDuMeuble = 128;
+                    break;
+                default:
+                    largeurDuMeuble = 48;
+            }
+    
+            const devantureL = (largeurMeubleInput.value) - largeurDuMeuble;
+            const devantureH = hauteurCote - 30;
+            const côtéL = lgCoulisses - 10;
+            const côtéH = hauteurCote
+    
+            const rowDevanture = drawerDimensionsBody.insertRow();
+            const tiroirCell = rowDevanture.insertCell(0);
+            tiroirCell.textContent = `Tiroir ${index + 1}`;
+            tiroirCell.rowSpan = 2;
+          
+            const imgCellDevanture = rowDevanture.insertCell(1);
+            const imgDevanture = document.createElement('img');
+            imgDevanture.src = 'img/devanture.png'; 
+            imgDevanture.alt = 'Devanture';
+            imgCellDevanture.appendChild(imgDevanture);
+    
+            rowDevanture.insertCell(2).textContent = `${devantureL.toFixed(1)} x ${devantureH.toFixed(1)} mm`;
+
+            const rowCote = drawerDimensionsBody.insertRow();
+
+            const imgCellCote = rowCote.insertCell(0);
+            const imgCote = document.createElement('img');
+            imgCote.src = 'img/cote.png'; 
+            imgCote.alt = 'Côté';
+            imgCellCote.appendChild(imgCote);
+    
+            rowCote.insertCell(1).textContent = `${côtéL.toFixed(1)} x ${côtéH.toFixed(1)} mm`;
+        });
+    }
+    
+    
     
     function handleAnglaiseChange(checkbox, rowIndex) {
         const currentRow = rightTable.rows[rowIndex];
@@ -296,6 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateAll() {
         updateDrawerRows();
+        updateThirdTable();
         updateSumHauteursFacade();
     }
 

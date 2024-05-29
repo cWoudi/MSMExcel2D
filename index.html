@@ -12,13 +12,13 @@
   <!-- Petit tableau à gauche -->
   <div class="table-container">
     <table class="left-table">
-      <tr><td>Hauteur Meuble</td><td><input type="number" id="hauteurMeuble" min="0"></td></tr>
-      <tr><td>Largeur Meuble</td><td><input type="number" id="largeurMeuble" min="0"></td></tr>
+      <tr><td>Hauteur Meuble</td><td><input type="number" id="hauteurMeuble" value="0" min="0"></td></tr>
+      <tr><td>Largeur Meuble</td><td><input type="number" id="largeurMeuble" value="0" min="0"></td></tr>
       <tr>
         <td>Profondeur Meuble</td>
         <td><input type="number" id="profondeurMeuble" value="300" min="300" required></td>
-    </tr>
-          <tr><td>Nombre de Tiroirs</td><td><input type="number" id="nbTiroirs" min="1" value="0"></td></tr>
+      </tr>
+      <tr><td>Nombre de Tiroirs</td><td><input type="number" id="nbTiroirs" min="1" value="0"></td></tr>
       <tr>
         <td>Espace Façade</td>
         <td>
@@ -40,10 +40,10 @@
         </td>
       </tr>
     </table>
-<div id="sumContainer">
-  Somme des Hauteurs Façade : <span id="sumHauteursFacade">0</span>
-</div>
-<p id="heightError">Toutes les hauteurs de façade doivent être d'au moins 80 mm.</p>
+    <div id="sumContainer">
+      Somme des Hauteurs Façade : <span id="sumHauteursFacade">0</span>
+    </div>
+    <p id="heightError">Toutes les hauteurs de façade doivent être d'au moins 80 mm.</p>
   </div>
 
   <div class="table-container">
@@ -57,6 +57,7 @@
           <th>Tiroir à l'anglaise ?</th>
           <th>Encastré</th>
           <th>Lg Coulisses</th>
+          <th>Hauteur Côté</th> <!-- Nouveau en-tête de colonne ajouté ici -->
         </tr>
       </thead>
       <tbody>
@@ -64,9 +65,21 @@
       </tbody>
     </table>    
   </div>
+
+  <!-- Nouveau tableau pour les dimensions des tiroirs -->
+  <div class="table-container">
+    <table class="drawer-dimensions">
+      <thead>
+        <tr><th>Tiroir</th><th>Vue</th><th>Dimensions</th></tr>
+      </thead>
+      <tbody id="drawerDimensionsBody">
+        <!-- Les lignes seront ajoutées par JavaScript -->
+      </tbody>
+    </table>
+  </div>
+
 </div>
 <canvas id="meubleCanvas" width="600" height="400" style="border:1px solid #000; display: block; margin: 20px auto;"></canvas>
-
 
 <script src="script.js"></script>
 </body>

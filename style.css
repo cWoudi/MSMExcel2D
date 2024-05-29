@@ -1,60 +1,76 @@
 body {
-    font-family: 'Arial', sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f8f8f8;
-  }
-  
-  .wrapper {
-    display: flex; /* Utilise flexbox pour aligner les éléments côte à côte */
-    justify-content: center; /* Centre les tableaux dans la page */
-    align-items: flex-start; /* Aligner les tableaux en haut */
-  }
-  
-  .table-container {
-    margin: 10px; /* Espacement autour de chaque tableau */
-  }
-
-  #sumContainer {
-    margin-top: 20px;
-    font-weight: bold;
-  }
-  
-  #sumHauteursFacade.overLimit {
-    color: red;
-  }
-  
-  
-  table {
-    border-collapse: collapse;
-  }
-
-  .left-table,
-  .right-table {
-    border: 1px solid black; /* Bordure noire pour le tableau entier */
-  }
-  
-  th, 
-  td {
-    border: 1px solid black; /* Bordure noire pour chaque cellule */
-    padding: 8px;
-  }
-  
-  th {
-    background-color: #ddd; /* Couleur de fond pour les en-têtes de tableau */
-  }
-  
-  select {
-    width: 100%;
-    padding: 4px;
-    border: 1px solid black; /* Bordure pour les sélecteurs */
-  }
-  
-  #heightError {
-    color: red;
-    max-width: 600px; /* Ou la largeur maximale selon votre mise en page */
-    white-space: normal;
-    display: none;
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f8f8f8;
 }
 
-  
+.wrapper {
+  display: flex; /* Utilise flexbox pour aligner les éléments côte à côte */
+  justify-content: center; /* Centre les tableaux dans la page */
+  align-items: flex-start; /* Aligner les tableaux en haut */
+  flex-wrap: wrap; /* Permet aux éléments de passer à la ligne suivante si nécessaire */
+}
+
+.table-container {
+  margin: 10px; /* Espacement autour de chaque tableau */
+}
+
+#sumContainer {
+  margin-top: 20px;
+  font-weight: bold;
+}
+
+#sumHauteursFacade.overLimit {
+  color: red;
+}
+
+table {
+  border-collapse: collapse;
+  width: auto; /* Assure que la largeur du tableau s'ajuste au contenu */
+}
+
+.left-table,
+.right-table,
+.drawer-dimensions { /* Applique un style cohérent à tous les tableaux */
+  border: 1px solid black; /* Bordure noire pour le tableau entier */
+}
+
+th, 
+td {
+  border: 1px solid black; /* Bordure noire pour chaque cellule */
+  padding: 8px;
+  text-align: left; /* Alignement du texte à gauche */
+}
+
+th {
+  background-color: #ddd; /* Couleur de fond pour les en-têtes de tableau */
+}
+
+select {
+  width: 100%;
+  padding: 4px;
+  border: 1px solid black; /* Bordure pour les sélecteurs */
+}
+
+#heightError {
+  color: red;
+  max-width: 600px; /* Ou la largeur maximale selon votre mise en page */
+  white-space: normal;
+  display: none;
+}
+
+/* Styles spécifiques pour le nouveau tableau des dimensions des tiroirs */
+.drawer-dimensions th {
+  background-color: #eee; /* Couleur de fond légèrement différente pour différencier */
+}
+
+.drawer-dimensions td {
+  text-align: center; /* Centrage du texte dans les cellules pour une meilleure lisibilité */
+}
+
+/* Styles pour gérer les images dans les cellules */
+.drawer-dimensions img {
+  width: 50px; /* Taille des images à ajuster selon les besoins */
+  height: auto;
+}

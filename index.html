@@ -57,7 +57,7 @@
           <th>Tiroir à l'anglaise ?</th>
           <th>Encastré</th>
           <th>Lg Coulisses</th>
-          <th>Hauteur Côté</th> <!-- Nouveau en-tête de colonne ajouté ici -->
+          <th>Hauteur Côté</th>
         </tr>
       </thead>
       <tbody>
@@ -76,9 +76,10 @@
         <!-- Les lignes seront ajoutées par JavaScript -->
       </tbody>
     </table>
+    <button onclick="exportTableToCSV('dimensions_tiroirs.csv')">Exporter</button>
   </div>
-
 </div>
+
 <canvas id="meubleCanvas" width="600" height="400" style="border:1px solid #000; display: block; margin: 20px auto;"></canvas>
 
 <script src="script.js"></script>

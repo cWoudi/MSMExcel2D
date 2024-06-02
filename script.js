@@ -1,3 +1,59 @@
+function exportTableToCSV(filename) {
+    const drawerDimensionsBody = document.getElementById('drawerDimensionsBody');
+    if (!drawerDimensionsBody) {
+        console.error('Table body for drawer dimensions not found');
+        return;
+    }
+
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += "Length,Width,Qty,Label,Enabled\n"; // Entêtes CSV
+
+    const rows = drawerDimensionsBody.querySelectorAll('tr');
+    let tiroirCount = 1; // Compteur pour les numéros de tiroir
+
+    // Boucler sur les rangées deux par deux
+    for (let i = 0; i < rows.length; i += 2) {
+        const rowDevanture = rows[i];
+        const rowCote = rows[i + 1];
+
+        if (rowDevanture && rowCote) {
+            // Récupérer les dimensions pour la devanture
+            const devantureDimensions = rowDevanture.cells[2].textContent;
+            const devantureParts = devantureDimensions.split(' x ');
+            if (devantureParts.length === 2) {
+                const lengthDevanture = Math.floor(parseFloat(devantureParts[0]));
+                const widthDevanture = Math.floor(parseFloat(devantureParts[1].replace(' mm', '')));
+
+                const csvRowDevanture = `${lengthDevanture},${widthDevanture},2,Devanture Tiroir ${tiroirCount},TRUE\n`;
+                csvContent += csvRowDevanture;
+            }
+
+            // Récupérer les dimensions pour le côté
+            const coteDimensions = rowCote.cells[1].textContent;
+            const coteParts = coteDimensions.split(' x ');
+            if (coteParts.length === 2) {
+                const lengthCote = Math.floor(parseFloat(coteParts[0]));
+                const widthCote = Math.floor(parseFloat(coteParts[1].replace(' mm', '')));
+
+                const csvRowCote = `${lengthCote},${widthCote},2,Côté Tiroir ${tiroirCount},TRUE\n`;
+                csvContent += csvRowCote;
+            }
+
+            // Incrémenter le numéro de tiroir après chaque couple de lignes
+            tiroirCount++;
+        }
+    }
+
+    // Encodage et création du lien pour le téléchargement
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const hauteurMeubleInput = document.querySelector('#hauteurMeuble');
     const largeurMeubleInput = document.querySelector('#largeurMeuble');
@@ -195,15 +251,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const imgCellCote = rowCote.insertCell(0);
             const imgCote = document.createElement('img');
-            imgCote.src = 'img/cote.png'; 
+            imgCote.src = 'img/cote.png';   
             imgCote.alt = 'Côté';
             imgCellCote.appendChild(imgCote);
     
             rowCote.insertCell(1).textContent = `${côtéL.toFixed(1)} x ${côtéH.toFixed(1)} mm`;
         });
     }
-    
-    
+     
     
     function handleAnglaiseChange(checkbox, rowIndex) {
         const currentRow = rightTable.rows[rowIndex];

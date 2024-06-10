@@ -48,7 +48,7 @@ table {
 .left-table,
 .right-table,
 .drawer-dimensions { /* Applique un style cohérent à tous les tableaux */
-  border: 1px solid black; /* Bordure noire pour le tableau entier */
+  border: 2px solid black; /* Bordure noire pour le tableau entier */
 }
 
 th, 

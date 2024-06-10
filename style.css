@@ -1,3 +1,18 @@
+header {
+  background-color: #7f6b67; /* Nouvelle couleur de fond de l'en-tête */
+  padding: 20px 40px; /* Augmentez l'espacement autour du contenu de l'en-tête */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Ombre sous l'en-tête plus prononcée */
+  display: flex; /* Utilise flexbox pour aligner les éléments à l'intérieur */
+  align-items: center; /* Centre les éléments verticalement */
+  height: 60px; /* Hauteur de l'en-tête */
+  margin-bottom: 2%;
+}
+
+.logo {
+  height: 90px; /* Hauteur augmentée du logo */
+  margin-right: 30px; /* Marge à droite du logo accrue */
+}
+
 body {
   font-family: 'Arial', sans-serif;
   margin: 0;
@@ -43,8 +58,10 @@ td {
   text-align: left; /* Alignement du texte à gauche */
 }
 
-th {
-  background-color: #ddd; /* Couleur de fond pour les en-têtes de tableau */
+.drawer-dimensions thead tr th,
+.right-table thead tr th {
+  background-color: #97817b;
+  color: white !important; /* Force white color despite inline styles */
 }
 
 select {
@@ -73,4 +90,36 @@ select {
 .drawer-dimensions img {
   width: 50px; /* Taille des images à ajuster selon les besoins */
   height: auto;
+}
+
+/* Style pour les étiquettes du tableau */
+.left-table td:first-child {
+  background-color: #ffd000; /* Jaune */
+  font-weight: bold;
+  text-align: left;
+  padding-left: 10px; /* Ajout d'un peu de marge à gauche */
+  color: #FFFFFF; /* Couleur de texte blanche */
+}
+
+/* Style pour les champs de saisie */
+.left-table input[type="number"],
+.left-table select {
+  width: 100%;
+  padding: 5px; /* Plus de padding pour agrandir le champ */
+  box-sizing: border-box; /* Permet d'inclure le padding dans la largeur définie */
+  border: 2px solid #ccc; /* Bordure plus visible */
+  background-color: #fff; /* Fond blanc pour les champs de saisie */
+}
+
+/* Augmentation de la taille du texte pour tous les éléments du tableau */
+.left-table {
+  font-size: 16px; /* Plus grande taille de texte */
+}
+
+/* Alignement des textes dans les dropdowns et ajustements */
+.left-table select {
+  color: #000; /* Texte en noir pour plus de visibilité */
+  text-align: center;
+  text-align-last: center; /* Centre le texte dans le dropdown */
+  -moz-text-align-last: center;
 }

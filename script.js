@@ -108,7 +108,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
         for (let i = 0; i < numberOfDrawers; i++) {
             const row = rightTable.insertRow();
-            row.insertCell(0).textContent = `Tiroir ${i + 1}`;
+            const label = `Tiroir ${i + 1}` + (i === 0 ? " (Bas)" : "") + (i === numberOfDrawers - 1 ? " (Haut)" : "");
+            row.insertCell(0).textContent = label;
     
             const hauteursFacadeInput = document.createElement('input');
             hauteursFacadeInput.type = 'number';
@@ -201,9 +202,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const encastré = encastréSelect ? encastréSelect.value : '0c';
     
         const rows = rightTable.querySelectorAll('tr');
-        rows.forEach((row, index) => { 
+        const rowCount = rows.length; // Nombre total de tiroirs
+        rows.forEach((row, index) => {
             const hauteurCoteInput = row.querySelector('.hauteurCote');
-            const lgCoulissesSelect = row.querySelector('.lg-coulisses');
+            const lgCoulissesSelect = row.querySelector('.lg-coulisses'); 
     
             if (!hauteurCoteInput || !lgCoulissesSelect) {
                 console.error('Required inputs not found in row', index);
@@ -213,7 +215,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const hauteurCote = parseFloat(hauteurCoteInput.value);
             const lgCoulisses = parseFloat(lgCoulissesSelect.value);
             
-            // Calculs basés sur l'encastrement
             let largeurDuMeuble;
             switch (encastré) {
                 case '0c':
@@ -226,38 +227,43 @@ document.addEventListener('DOMContentLoaded', () => {
                     largeurDuMeuble = 128;
                     break;
                 default:
-                    largeurDuMeuble = 48;
+                    largeurDuMeuble = 48; // Valeur par défaut si aucune correspondance
             }
     
             const devantureL = (largeurMeubleInput.value) - largeurDuMeuble;
             const devantureH = hauteurCote - 30;
             const côtéL = lgCoulisses - 10;
-            const côtéH = hauteurCote
+            const côtéH = hauteurCote;
     
+            // Ajout de "(Bas)" pour le premier tiroir et "(Haut)" pour le dernier
+            const label = `Tiroir ${index + 1}` + (index === 0 ? " (Bas)" : "") + (index === rowCount - 1 ? " (Haut)" : "");
+    
+            // Devanture row
             const rowDevanture = drawerDimensionsBody.insertRow();
             const tiroirCell = rowDevanture.insertCell(0);
-            tiroirCell.textContent = `Tiroir ${index + 1}`;
+            tiroirCell.textContent = label;
             tiroirCell.rowSpan = 2;
-          
+    
             const imgCellDevanture = rowDevanture.insertCell(1);
             const imgDevanture = document.createElement('img');
-            imgDevanture.src = 'img/devanture.png'; 
+            imgDevanture.src = 'img/devanture.png';
             imgDevanture.alt = 'Devanture';
             imgCellDevanture.appendChild(imgDevanture);
     
             rowDevanture.insertCell(2).textContent = `${devantureL.toFixed(1)} x ${devantureH.toFixed(1)} mm`;
-
+    
+            // Côté row
             const rowCote = drawerDimensionsBody.insertRow();
-
             const imgCellCote = rowCote.insertCell(0);
             const imgCote = document.createElement('img');
-            imgCote.src = 'img/cote.png';   
+            imgCote.src = 'img/cote.png';
             imgCote.alt = 'Côté';
             imgCellCote.appendChild(imgCote);
     
             rowCote.insertCell(1).textContent = `${côtéL.toFixed(1)} x ${côtéH.toFixed(1)} mm`;
         });
     }
+    
      
     
     function handleAnglaiseChange(checkbox, rowIndex) {
@@ -418,9 +424,18 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.setLineDash([]);
         ctx.textAlign = 'center';
         ctx.fillText(`Largeur: ${largeurMeuble} mm`, canvas.width / 2, startY + scaledHeight + 20);
-        ctx.textAlign = 'start';
-        ctx.fillText(`Hauteur: ${hauteurMeuble} mm`, startX - 50, startY + scaledHeight / 2);
+    
+        // Rotation pour le texte vertical de la hauteur
+        ctx.save(); // Sauvegarde l'état du contexte
+        ctx.translate(startX - 10, startY + scaledHeight / 2);
+        ctx.rotate(-Math.PI / 2); // Rotation de 90 degrés dans le sens antihoraire
+        ctx.textAlign = 'center';
+        ctx.fillText(`Hauteur: ${hauteurMeuble} mm`, 0, 0);
+        ctx.restore(); // Restaure l'état du contexte
+    
+        ctx.textAlign = 'start'; // Réinitialiser l'alignement du texte si nécessaire
     }
+    
     
     
     hauteurMeubleInput.addEventListener('input', drawMeuble);
